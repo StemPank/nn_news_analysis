@@ -1,20 +1,3 @@
-# import requests
-
-# API_KEY = 'fdddd7c6666e8550aad7ab5134a59d073712298e'
-# url = f'https://cryptopanic.com/api/v1/posts/?auth_token={API_KEY}&public=true'
-
-# response = requests.get(url)
-# if response.status_code == 200:
-#     data = response.json()
-#     for post in data.get('results', []):
-#         print(f"Заголовок: {post['title']}")
-#         print(f"Ссылка: {post['url']}")
-#         print(f"Дата публикации: {post['published_at']}")
-#         print(f"Теги: {post.get('currencies')}\n")
-# else:
-#     print(f"Ошибка при получении данных: {response.status_code}")
-
-
 import requests
 from datetime import datetime
 

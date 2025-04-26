@@ -1,4 +1,5 @@
-import os, json, datetime
+import os, json
+from datetime import datetime, timezone
 import sqlite3
 from loggings import LoggerManager
 from dateutil import parser as date_parser
@@ -6,7 +7,7 @@ import pytz
 
 from parser.config import COIN_KEYWORDS
 
-logger = LoggerManager().get_main_logger()
+logger = LoggerManager().get_named_logger("news_analyzer")
 
 def convert_time_to_local(utc_time_str, timezone='Asia/Irkutsk'):
     try:
@@ -77,8 +78,17 @@ class MainDatabase():
         for post in news_items:
             title = post.get("title", "")
             url = post.get("url", "")
-            published = convert_time_to_local(post.get("published_at", ""))
+
+            # Преобразуем время в UTC
+            try:
+                published_dt = date_parser.parse(post.get("published_at", ""))
+                published_utc = published_dt.astimezone(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
+            except Exception as e:
+                logger.warning(f"Ошибка при парсинге времени: {e}")
+                published_utc = post.get("published_at", "")  # fallback
             summary = post.get("summary", "")
+
+            # Определяем валюты
             currency_list = extract_coin_func(title + " " + summary, post.get("currencies"))
             currency_str = ", ".join(currency_list)  # Преобразуем список в строку
             content = ""
@@ -87,7 +97,7 @@ class MainDatabase():
                 cursor.execute("""
                     INSERT OR IGNORE INTO news (title, url, published_at, currency, summary, content)
                     VALUES (?, ?, ?, ?, ?, ?)
-                """, (title, url, published, currency_str, summary, content))
+                """, (title, url, published_utc, currency_str, summary, content))
                 logger.info(f"✅ Сохранена новость: [{currency_str}] {title}")
             except sqlite3.Error as e:
                 logger.error(f"Ошибка записи в БД: {e}")
@@ -123,3 +133,8 @@ class MainDatabase():
         connection.close()
         return results
 
+if __name__ == "__main__":
+    database = MainDatabase()
+    grouped_news = database.get_news_by_currency()
+    for currency, news_items in grouped_news.items():
+        print(currency, news_items)

@@ -16,7 +16,7 @@
 
 4. Переход в директорию fisher
 
-```cd telegram_bot_nlp```
+```cd nn_news_analysis```
 
 5. Установка зависимостей
 

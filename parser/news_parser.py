@@ -1,35 +1,19 @@
-# import requests
-
-# API_KEY = 'fdddd7c6666e8550aad7ab5134a59d073712298e'
-# url = f'https://cryptopanic.com/api/v1/posts/?auth_token={API_KEY}&public=true'
-
-# response = requests.get(url)
-# if response.status_code == 200:
-#     data = response.json()
-#     for post in data.get('results', []):
-#         print(f"Заголовок: {post['title']}")
-#         print(f"Ссылка: {post['url']}")
-#         print(f"Дата публикации: {post['published_at']}")
-#         print(f"Теги: {post.get('currencies')}\n")
-# else:
-#     print(f"Ошибка при получении данных: {response.status_code}")
-
-
 import requests
 from datetime import datetime
 
 from parser.config import CryptoPanic_API_KEY, CryptoPanic_url
-from db import MainDatabase
+from db_sentiment_app import MainDatabase
 from loggings import LoggerManager
 
-logger = LoggerManager().get_main_logger()
+logger = LoggerManager().get_named_logger("news_analyzer")
 
 COIN_KEYWORDS = {
     "Bitcoin": ["bitcoin", "btc", "btc/usd", "btcusdt"],
     "Ethereum": ["ethereum", "eth", "eth/usd", "ethusdt"],
     "Solana": ["solana", "sol", "sol/usdt"],
-    "Ripple": ["ripple", "xrp", "xrp/usdt"],
-    # Добавь другие при необходимости
+    "Ripple": ["ripple", "xrp", "xrp/usd", "xrpusdt"],
+    "Dogecoin": ["dogecoin", "doge", "doge/usd", "dogeusdt"],
+    "Tether": ["tether", "usdt", "usdt/usd", "usd/usdt"],
 }
 
 class CryptoPanicParser:
